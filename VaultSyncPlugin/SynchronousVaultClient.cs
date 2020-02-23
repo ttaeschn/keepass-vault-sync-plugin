@@ -50,11 +50,14 @@ namespace VaultSyncPlugin
         /// <param name="vaultPassword">The password</param>
         public SynchronousVaultClient(Uri vaultUrl, string authPath, string vaultLogin, string vaultPassword)
         {
-            // Disable SSL checks, for self-signed certificates.
-            // TODO could be a plugin setting
             System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = System.Globalization.CultureInfo.GetCultureInfo("en-US");
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
-            ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+            
+            // check KeePass config to accept invalid SSL certificates
+            if (KeePass.Program.Config.Security.SslCertsAcceptInvalid.Equals(true))
+            {
+                ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+            }
 
             this.authPath = authPath;
             this.vaultLogin = vaultLogin;
