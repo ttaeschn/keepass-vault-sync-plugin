@@ -238,9 +238,19 @@ namespace VaultSyncPlugin
         {
             var entry = new PwEntry(true, true);
             entry.Strings.Set(PwDefs.TitleField, new ProtectedString(false, secret.Name));
-            entry.Strings.Set(PwDefs.UserNameField, new ProtectedString(false, secret.User));
-            entry.Strings.Set(PwDefs.PasswordField, new ProtectedString(false, secret.Password));
-            entry.Strings.Set(PwDefs.UrlField, new ProtectedString(false, secret.Url));
+            if (!string.IsNullOrEmpty(secret.User))
+            {
+                entry.Strings.Set(PwDefs.UserNameField, new ProtectedString(false, secret.User));
+            }
+            if (!string.IsNullOrEmpty(secret.Password))
+            {
+                entry.Strings.Set(PwDefs.PasswordField, new ProtectedString(false, secret.Password));
+            }
+            if (!string.IsNullOrEmpty(secret.Url))
+            {
+                entry.Strings.Set(PwDefs.UrlField, new ProtectedString(false, secret.Url));
+            }
+             
             foreach (var item in secret.Content)
             {
                 entry.Strings.Set(item.Key, new ProtectedString(false, item.Value));
