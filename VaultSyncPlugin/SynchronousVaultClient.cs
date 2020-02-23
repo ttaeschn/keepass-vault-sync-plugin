@@ -62,15 +62,7 @@ namespace VaultSyncPlugin
             this.authPath = authPath;
             this.vaultLogin = vaultLogin;
             this.vaultPassword = vaultPassword;
-
-            if (authPath.Equals("token"))
-            {
-                this.client = new VaultClient(vaultUrl, token = vaultPassword);
-            }
-            else {
-                this.client = new VaultClient(vaultUrl);
-            }
-
+            this.client = new VaultClient(vaultUrl);
         }
 
         /// <summary>
