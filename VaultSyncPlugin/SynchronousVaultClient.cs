@@ -85,20 +85,33 @@ namespace VaultSyncPlugin
                 // May be connection issue, or forbidden. We just continue.
             }
 
-            foreach (var key in keyList)
+            if (keyList.Count() < 1)
             {
-                if (SecretFolder.IsFolder(key))
-                {
-                    // Resursive call
-                    folder.AddFolder(await this.GetSecrets(path + "/" + key));
-                }
-                else
-                {
-                    // Adds secret
-                    folder.AddSecret(this.GetSecret(path + "/" + key));
-                }
+                KeePassLib.Utility.MessageService.ShowWarning("No Secrets could be retrieved for: " + path);
+                return null; 
             }
 
+            foreach (var key in keyList)
+            {
+                try
+                {
+                    if (SecretFolder.IsFolder(key))
+                    {
+                        // Resursive call 
+                        folder.AddFolder(await this.GetSecrets(path + "/" + key));
+                    }
+                    else
+                    {
+                        folder.AddSecret(this.GetSecret(path + "/" + key));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // we are unable to retrieve the secret. 
+                    // cause could be ACL prohibiting READ access to secret
+                }
+            }
+          
             return folder;
         }
 
@@ -109,14 +122,15 @@ namespace VaultSyncPlugin
         /// <returns>The secret list.</returns>
         private async Task<List<string>> GetSecretList(string path)
         {
-            try
+
+            if (this.CheckToken())
             {
                 this.CheckToken();
                 return await Task.FromResult(client.Secret.List(path).Result.Data.Keys);
             }
-            catch (Exception ex)
+            else
             {
-                // May be unauthorized access
+                KeePassLib.Utility.MessageService.ShowWarning("login to vault not successful.");
                 return new List<string>();
             }
         }
@@ -124,14 +138,22 @@ namespace VaultSyncPlugin
         /// <summary>
         /// Checks if the token is downloaded, or else download it.
         /// </summary>
-        private void CheckToken()
+        public Boolean CheckToken()
         {
             if (string.IsNullOrEmpty(this.token))
             {
-                this.token = this.GetToken(this.authPath, this.vaultLogin, this.vaultPassword).Result;
+                this.client.Token = this.vaultPassword;
+                try
+                {
+                    this.token = this.GetToken(this.authPath, this.vaultLogin, this.vaultPassword).Result;
+                }
+                catch (Exception ex) 
+                {
+                    return false;
+                }               
                 this.client.Token = this.token;
             }
-
+            return true;
         }
 
         /// <summary>
@@ -143,7 +165,7 @@ namespace VaultSyncPlugin
         /// <returns></returns>
         private async Task<string> GetToken(string authPath, string user, string password)
         {
-            
+
             var loginRequest = new LoginRequest
             {
                 Password = password
@@ -158,21 +180,9 @@ namespace VaultSyncPlugin
         /// <param name="path"></param>
         /// <returns></returns>
         private Secret GetSecret(string path)
-        {
-            Secret secret;
-
-            try
-            {
-                var data = Task.FromResult(client.Secret.Read<Dictionary<string, string>>(path).Result.Data).Result;
-                secret = this.SecretFromDictionary(this.GetLastFolder(path), data);
-            }
-            catch (Exception ex)
-            {
-                // Creates the entry with the exception message. Could help analyzing when failing.
-                secret = new Secret(this.GetLastFolder(path), ex.Message, string.Empty, new Dictionary<string, string>());
-            }
-
-            return secret;
+        { 
+           var data = Task.FromResult(client.Secret.Read<Dictionary<string, string>>(path).Result.Data).Result;
+           return this.SecretFromDictionary(this.GetLastFolder(path), data);
         }
 
         /// <summary>

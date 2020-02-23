@@ -187,11 +187,19 @@ namespace VaultSyncPlugin
                 !string.IsNullOrEmpty(vaultAuthPath))
             {
                 // Download secrets
-                var secrets = this.DownloadSecrets(this.GetSyncGroupName(entryName), vaultUrl, vaultAuthPath, vaultLogin, vaultPassword, vaultPath);
-
-                // Create new sync group to synchronize data.
-                var newGroup = this.CreateGroup(this.GetSyncGroupName(entryName), secrets, group.IconId);
-                group.AddGroup(newGroup, true);
+                try
+                {
+                    var secrets = this.DownloadSecrets(this.GetSyncGroupName(entryName), vaultUrl, vaultAuthPath, vaultLogin, vaultPassword, vaultPath);
+                    if (secrets != null)
+                    {
+                        var newGroup = this.CreateGroup(this.GetSyncGroupName(entryName), secrets, group.IconId);
+                        group.AddGroup(newGroup, true);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    KeePassLib.Utility.MessageService.ShowWarning("unable to sync secrets:\n" + ex.GetBaseException());
+                }            
             }
         }
 
@@ -277,6 +285,11 @@ namespace VaultSyncPlugin
             string vaultPath)
         {
             var client = new SynchronousVaultClient(new Uri(vaultUrl), vaultAuthPath, vaultUsername, vaultPassword);
+            if (!client.CheckToken())
+            {
+                KeePassLib.Utility.MessageService.ShowWarning("login to vault not successful.");
+                return null;
+            }
             return client.GetSecrets(vaultPath).Result;
         }
 
