@@ -12,7 +12,7 @@ For Linux users, you need to install the latest `mono-complete` package.
 
 ## Usage
 
-1. Download the [latest PLGX file](https://github.com/Orange-OpenSource/keepass-vault-sync-plugin/releases) and copy it in the KeePass installation folder, in plugins directory
+1. Download the [latest PLGX file](https://github.com/ttaeschn/keepass-vault-sync-plugin/releases) and copy it in the KeePass installation folder, in plugins directory
    * For Windows it's in `C:\Program Files (x86)\KeePass Password Safe 2\Plugins`
    * For Linux it's in `/usr/lib/keepass2/Plugins`
 2. Open your database

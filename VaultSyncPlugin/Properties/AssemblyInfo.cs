@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("VaultSyncPlugin")]
 [assembly: AssemblyDescription("Synchronizes Vault secrets in the local database. Licensed under LGPL-2.1")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Orange Application for Business")]
+[assembly: AssemblyCompany("Github ttaeschn. Based on works by Orange Application for Business")]
 [assembly: AssemblyProduct("KeePass Plugin")]
-[assembly: AssemblyCopyright("Copyright © Orange Business Services 2019")]
+[assembly: AssemblyCopyright("Copyright ttaeschn 2020. Copyright © Orange Business Services 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.3.0")]
-[assembly: AssemblyFileVersion("1.0.3.0")]
+[assembly: AssemblyVersion("1.0.4.0")]
+[assembly: AssemblyFileVersion("1.0.4.0")]
